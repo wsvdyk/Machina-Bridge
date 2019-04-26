@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -53,7 +54,7 @@ namespace MachinaBridge
     
         // https://stackoverflow.com/a/18331866/1934487
         internal SynchronizationContext uiContext;
-        
+
         BoundContent dc;
 
         public MachinaBridgeWindow()
@@ -461,6 +462,21 @@ namespace MachinaBridge
             return false;
         }
 
+        
+        /// <summary>
+        /// Print error when wrong tool is metioned. Function only works for creating of tools atm
+        /// line number will automatically change.
+        /// </summary>
+        /// <param name="tool"></param>
+        private void ErrorWithLineNum(string tool)
+        {
+            StackFrame stackFrame = new StackFrame(1, true);
+
+            int line = stackFrame.GetFileLineNumber();
+            Logger.Error($"tool {tool} doesn't exists yet in the source code." +
+                         $"source code needs to be edited at MainWindow.xaml.cs line {line} ");
+        }
+
 
         public bool ExecuteInstruction(string instruction)
         {
@@ -470,6 +486,54 @@ namespace MachinaBridge
                 Machina.Logger.Error($"I don't understand \"{instruction}\"...");
                 return false;
             }
+
+            //  ███╗   ███╗██╗   ██╗     ██████╗ ██╗    ██╗███╗   ██╗
+            //  ████╗ ████║╚██╗ ██╔╝    ██╔═══██╗██║    ██║████╗  ██║
+            //  ██╔████╔██║ ╚████╔╝     ██║   ██║██║ █╗ ██║██╔██╗ ██║
+            //  ██║╚██╔╝██║  ╚██╔╝      ██║   ██║██║███╗██║██║╚██╗██║
+            //  ██║ ╚═╝ ██║   ██║       ╚██████╔╝╚███╔███╔╝██║ ╚████║
+            //  ╚═╝     ╚═╝   ╚═╝        ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝
+            
+            if (args[0].Equals("Test1", StringComparison.CurrentCultureIgnoreCase))
+            {
+                // try catch not necessary since no arg are not used
+                // try
+                // {
+                return bot.Test1();
+                // }
+                // catch (Exception ex)
+                // {
+                    // BadFormatInstruction(instruction, ex);
+                    // return false;
+                // }
+            }
+            else if (args[0].Equals("Test2", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return bot.Test2();
+            }
+            else if (args[0].Equals("tool", StringComparison.CurrentCultureIgnoreCase)) // creating and defining a tool
+            {
+                if (args[1].Equals("pallet", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return bot.DefineTool("pallet", new Machina.Point(-63, 0, 70), Machina.Orientation.WorldXY);
+                }
+                if (args[1].Equals("vacuum", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return bot.DefineTool("vacuum", new Machina.Point(83, 0, 50), Machina.Orientation.WorldXY);
+                }
+
+                // print error with line number.
+                ErrorWithLineNum(args[1]);
+
+                return false;
+            }
+
+            //  ███████╗██╗  ██╗██╗███████╗████████╗██╗███╗   ██╗ ██████╗ 
+            //  ██╔════╝╚██╗██╔╝██║██╔════╝╚══██╔══╝██║████╗  ██║██╔════╝ 
+            //  █████╗   ╚███╔╝ ██║███████╗   ██║   ██║██╔██╗ ██║██║  ███╗
+            //  ██╔══╝   ██╔██╗ ██║╚════██║   ██║   ██║██║╚██╗██║██║   ██║
+            //  ███████╗██╔╝ ██╗██║███████║   ██║   ██║██║ ╚████║╚██████╔╝
+            //  ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝   ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
             // This is horrible, but oh well...
             if (args[0].Equals("MotionMode", StringComparison.CurrentCultureIgnoreCase))
