@@ -51,17 +51,21 @@ namespace MachinaBridge
         public  string _connectionManager;
 
         internal List<string> _connectedClients = new List<string>();
-    
+
         // https://stackoverflow.com/a/18331866/1934487
         internal SynchronizationContext uiContext;
 
         BoundContent dc;
+
+        public static Task _t = null;
+        public static CancellationTokenSource _cts = null;
 
         public MachinaBridgeWindow()
         {
             InitializeComponent();
 
             dc = new BoundContent(this);
+
 
             DataContext = dc;
 
@@ -232,7 +236,18 @@ namespace MachinaBridge
 
         private void Bot_ActionIssued(object sender, ActionIssuedArgs args)
         {
-            this.dc.ActionsQueue.Add(new ActionWrapper(args.LastAction));
+            // cannot add args when it is comming from another thread.
+            // all further adds will also fail!
+            // possible fix: https://stackoverflow.com/a/16367902/7183609
+            // failed to implement as in class MainWindow possible fix in BoundContent?
+            try
+            {
+                this.dc.ActionsQueue.Add(new ActionWrapper(args.LastAction));
+            }
+            catch (Exception ex)
+            {
+                // anything you want to do with a failed add.
+            }
         }
         
 
@@ -477,6 +492,85 @@ namespace MachinaBridge
                          $"source code needs to be edited at MainWindow.xaml.cs line {line} ");
         }
 
+        /// <summary>
+        /// Check if the given action can be repeated or not
+        /// </summary>
+        /// <param name="arg">complete action with (*)</param>
+        /// <returns></returns>
+        private bool CanRedo(string arg)
+        {
+            string[] args = Machina.Utilities.Parsing.ParseStatement(arg);
+            if (args == null || args.Length == 0)
+            {
+                Machina.Logger.Error($"I don't understand \"{arg}\"...");
+                return false;
+            }
+
+            if (_t != null) // stop task if exsists
+            {
+                _cts.Cancel();
+                _t.Wait();
+            }
+
+            if (Enum.GetNames(typeof(RedoAction)).Contains(args[0]))
+            {
+                //Thread.Sleep(1000); not necessary I believe
+                _cts = new CancellationTokenSource();
+                _t = Task.Run(() => LiveTask(arg, bot, _cts.Token));
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Thread function.
+        /// https://stackoverflow.com/a/55905915/7183609
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="bot"></param>
+        /// <param name="ct"></param>
+        private static void LiveTask(object obj, Robot bot, CancellationToken ct)
+        {
+            string arg = obj.ToString();
+            while (!ct.IsCancellationRequested) // continue with task untill CancelationRequest is set.
+            {
+                if (Robot._inExecution == 0)
+                {
+                    RedoInstruction(arg, bot);
+                }
+                Thread.Sleep(500); // let thread sleep for a little while so that it is not a constant check
+            }
+        }
+
+        /// <summary>
+        /// Near copy of ExecuteInstruction but only with the tasks that are able to be redone
+        /// </summary>
+        /// <param name="instruction"></param>
+        /// <param name="bot"></param>
+        private static bool RedoInstruction(string instruction, Robot bot)
+        {
+            string[] args = Machina.Utilities.Parsing.ParseStatement(instruction);
+            if (args == null || args.Length == 0)
+            {
+                Machina.Logger.Error($"I don't understand \"{instruction}\"...");
+                return false;
+            }
+
+            if (args[0].Equals("Test1", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return bot.Test1();
+            }
+            else if (args[0].Equals("Test2", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return bot.Test2();
+            }
+
+            // If here, instruction is not available or something went wrong...
+            Machina.Logger.Error($"I don't understand \"{instruction}\"...");
+            return false;
+
+        }
+
 
         public bool ExecuteInstruction(string instruction)
         {
@@ -496,16 +590,7 @@ namespace MachinaBridge
             
             if (args[0].Equals("Test1", StringComparison.CurrentCultureIgnoreCase))
             {
-                // try catch not necessary since no arg are not used
-                // try
-                // {
                 return bot.Test1();
-                // }
-                // catch (Exception ex)
-                // {
-                    // BadFormatInstruction(instruction, ex);
-                    // return false;
-                // }
             }
             else if (args[0].Equals("Test2", StringComparison.CurrentCultureIgnoreCase))
             {

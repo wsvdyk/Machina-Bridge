@@ -161,12 +161,13 @@ namespace MachinaBridge
         
         internal void IssueInputBlock()
         {
+            string instr = InputBlock.Text;
             dc.ConsoleInput = InputBlock.Text;
             dc.RunConsoleInput();
             InputBlock.Focus();
+            CanRedo(instr);
+            Machina.Robot._firstDone = false;
         }
-
-
 
         /// <summary>
         /// Quick and dirty clear the ConsoleInput on first click.
