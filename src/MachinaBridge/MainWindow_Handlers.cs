@@ -166,7 +166,6 @@ namespace MachinaBridge
             dc.RunConsoleInput();
             InputBlock.Focus();
             CanRedo(instr);
-            Machina.Robot._firstDone = false;
         }
 
         /// <summary>
