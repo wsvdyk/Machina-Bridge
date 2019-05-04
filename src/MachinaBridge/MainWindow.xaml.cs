@@ -597,7 +597,8 @@ namespace MachinaBridge
             {
                 return bot.Test2();
             }
-            else if (args[0].Equals("tool", StringComparison.CurrentCultureIgnoreCase)) // creating and defining a tool
+            // easy way to define tool
+            else if (args[0].Equals("tool", StringComparison.CurrentCultureIgnoreCase))
             {
                 if (args[1].Equals("pallet", StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -612,6 +613,36 @@ namespace MachinaBridge
                 ErrorWithLineNum(args[1]);
 
                 return false;
+            }
+            else if (args[0].Equals("MoveToRobTarget", StringComparison.CurrentCultureIgnoreCase))
+            {
+                // action MoveToRobTarget is only available in ABB robots
+                // further testing for UR robots is needed (have no UR Robot)
+                if (bot.Brand == RobotType.ABB)
+                {
+                    try
+                    {
+                        return bot.MoveToRobTarget(
+                            Convert.ToDouble(args[1], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[2], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[3], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[4], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[5], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[6], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[7], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[8], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[9], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[10], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[11], CultureInfo.InvariantCulture)
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        BadFormatInstruction(instruction, ex);
+                        return false;
+                    }
+                }
+
             }
 
             //  ███████╗██╗  ██╗██╗███████╗████████╗██╗███╗   ██╗ ██████╗ 
@@ -1130,6 +1161,7 @@ namespace MachinaBridge
                     }
 
                     // If here, something went wrong...
+                    // why is this hear and not a call to BadFormatInstruction?
                     Machina.Logger.Error($"Badly formatted instruction: \"{instruction}\"");
                     return false;
                 }
