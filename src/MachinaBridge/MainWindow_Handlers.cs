@@ -161,11 +161,9 @@ namespace MachinaBridge
         
         internal void IssueInputBlock()
         {
-            string instr = InputBlock.Text;
             dc.ConsoleInput = InputBlock.Text;
             dc.RunConsoleInput();
             InputBlock.Focus();
-            CanRedo(instr);
         }
 
         /// <summary>
