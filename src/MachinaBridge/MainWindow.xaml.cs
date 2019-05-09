@@ -550,16 +550,99 @@ namespace MachinaBridge
                 }
 
             }
+            else if (args[0].Equals("MoveCToRobTarget", StringComparison.CurrentCultureIgnoreCase))
+            {
+                // Action MovecToRobTarget is only available to ABB robots
+                // further testing for UR robots is needed (have no UR Robot)
+                if (bot.Brand == RobotType.ABB)
+                {
+                    try
+                    {
+                        return bot.MovecToRobTarget(
+                            Convert.ToDouble(args[1], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[2], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[3], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[4], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[5], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[6], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[7], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[8], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[9], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[10], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[11], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[12], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[13], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[14], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[15], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[16], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[17], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[18], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[19], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[20], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[21], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[22], CultureInfo.InvariantCulture)
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        BadFormatInstruction(instruction, ex);
+                        return false;
+                    }
+                }
+            }
+            else if (args[0].Equals("abbDefineTool", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (bot.Brand == RobotType.ABB)
+                {
+                    try
+                    {
+                        return bot.AbbDefineTool(
+                            args[1],
+                            Convert.ToDouble(args[2], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[3], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[4], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[5], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[6], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[7], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[8], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[9], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[10], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[11], CultureInfo.InvariantCulture),
+                            Convert.ToDouble(args[12], CultureInfo.InvariantCulture)
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        BadFormatInstruction(instruction, ex);
+                        return false;
+                    }
+                }
+            }
+            else if (args[0].Equals("abbAttachTool", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (bot.Brand == RobotType.ABB)
+                {
+                    try
+                    {
+                        return bot.AbbAttachTool(args[1]);
+                    }
+                    catch (Exception ex)
+                    {
+                        BadFormatInstruction(instruction, ex);
+                        return false;
+                    }
+                }
+            }
 
-            //  ███████╗██╗  ██╗██╗███████╗████████╗██╗███╗   ██╗ ██████╗ 
-            //  ██╔════╝╚██╗██╔╝██║██╔════╝╚══██╔══╝██║████╗  ██║██╔════╝ 
-            //  █████╗   ╚███╔╝ ██║███████╗   ██║   ██║██╔██╗ ██║██║  ███╗
-            //  ██╔══╝   ██╔██╗ ██║╚════██║   ██║   ██║██║╚██╗██║██║   ██║
-            //  ███████╗██╔╝ ██╗██║███████║   ██║   ██║██║ ╚████║╚██████╔╝
-            //  ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝   ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+                //  ███████╗██╗  ██╗██╗███████╗████████╗██╗███╗   ██╗ ██████╗ 
+                //  ██╔════╝╚██╗██╔╝██║██╔════╝╚══██╔══╝██║████╗  ██║██╔════╝ 
+                //  █████╗   ╚███╔╝ ██║███████╗   ██║   ██║██╔██╗ ██║██║  ███╗
+                //  ██╔══╝   ██╔██╗ ██║╚════██║   ██║   ██║██║╚██╗██║██║   ██║
+                //  ███████╗██╔╝ ██╗██║███████║   ██║   ██║██║ ╚████║╚██████╔╝
+                //  ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝   ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
 
-            // This is horrible, but oh well...
-            if (args[0].Equals("MotionMode", StringComparison.CurrentCultureIgnoreCase))
+                // This is horrible, but oh well...
+                if (args[0].Equals("MotionMode", StringComparison.CurrentCultureIgnoreCase))
             {
                 try
                 {
